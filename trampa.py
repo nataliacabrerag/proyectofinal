@@ -1,60 +1,87 @@
-# trampa.py
 from ursina import *
+import random
 
 def abrir_tienda_trampas(tablero, jugador_actual):
-    """
-    tablero: instancia del Tablero
-    jugador_actual: 1 o 2
-    """
 
-    # Identificar jugador y rival
+    # ---------------------------------------------------------
+    # Ocultar botones del tablero
+    # ---------------------------------------------------------
+    if hasattr(tablero, 'ui_general'):
+        tablero.ui_general.disable()
+
+    if hasattr(tablero, 'boton_dado'):
+        tablero.boton_dado.enabled = False
+    if hasattr(tablero, 'boton_tienda'):
+        tablero.boton_tienda.enabled = False
+
+    # Jugadores
     jugador = tablero.jugador1 if jugador_actual == 1 else tablero.jugador2
     rival   = tablero.jugador2 if jugador_actual == 1 else tablero.jugador1
-
-    # Obtener puntaje actual
     puntaje = tablero.puntaje_j1 if jugador_actual == 1 else tablero.puntaje_j2
 
-    # PRECIOS
+    # Proteger atributos
+    for obj in (jugador, rival):
+        if not hasattr(obj, 'ayudas'): obj.ayudas = 0
+        if not hasattr(obj, 'bloqueado'): obj.bloqueado = False
+        if not hasattr(obj, 'ddos'): obj.ddos = False
+        if not hasattr(obj, 'sql_inyeccion'): obj.sql_inyeccion = False
+        if not hasattr(obj, 'zero_day'): obj.zero_day = False
+        if not hasattr(obj, 'dado_negativo'): obj.dado_negativo = False
+
+    # Precios
     precios = {
+        "firewall": 7,
+        "sql": 6,
+        "phishing": 5,
+        "ddos": 6,
+        "ransom": 9,
+        "zero_day": 10,
         "robar": 5,
         "intercambiar": 8,
         "dado_neg": 6,
-        "perder_ayuda": 4
+        "perder_ayuda": 4,
     }
 
-    # --- Ventana ---
-    tienda = WindowPanel(
-        title="🛒 Tienda de Trampas",
-        content=[],
-        popup=True
+    # ---------------------------------------------------------
+    # UI contenedor central
+    # ---------------------------------------------------------
+    ui = Entity(parent=camera.ui)
+
+    info = Text(
+        f"Puntaje disponible: {puntaje}",
+        scale=1.3,
+        color=color.yellow,
+        y=.38,
+        parent=ui
     )
 
-    # Texto informativo
-    info = Text(f"Puntaje disponible: {puntaje}", scale=1, color=color.yellow)
-    tienda.content.append(info)
-    tienda.content.append(Text("Selecciona una trampa:", scale=1))
+    # ---------------------------------------------------------
+    # CIERRA TIENDA Y REACTIVA EL TABLERO
+    # ---------------------------------------------------------
+    def cerrar_tienda():
+        ui.disable()
+        if hasattr(tablero, 'ui_general'):
+            tablero.ui_general.enable()
+        tablero.boton_dado.enabled = True
+        tablero.boton_tienda.enabled = True
 
-    # -----------------------------------------------------
-    # ACCIONES DE CADA TRAMPA
-    # -----------------------------------------------------
-
+    # ---------------------------------------------------------
+    # Función comprar
+    # ---------------------------------------------------------
     def comprar_trampa(tipo):
         nonlocal puntaje
-
         costo = precios[tipo]
 
         if puntaje < costo:
-            print("❌ No tienes suficiente puntaje.")
-            info.text = f"Puntaje disponible: {puntaje} (INSUFICIENTE)"
+            info.text = f"Puntaje: {puntaje} (insuficiente)"
             info.color = color.red
             return
 
-        # Pagar
+        # Cobrar puntos
         puntaje -= costo
         info.text = f"Puntaje disponible: {puntaje}"
         info.color = color.yellow
 
-        # Actualizar puntaje del tablero
         if jugador_actual == 1:
             tablero.puntaje_j1 = puntaje
             tablero.texto_puntaje_j1.text = f"Puntaje Jugador 1: {puntaje}"
@@ -62,66 +89,108 @@ def abrir_tienda_trampas(tablero, jugador_actual):
             tablero.puntaje_j2 = puntaje
             tablero.texto_puntaje_j2.text = f"Puntaje Jugador 2: {puntaje}"
 
-        # --------------------------
-        #   EFECTOS DE LAS TRAMPAS
-        # --------------------------
+        # ----------- Lógica de trampas --------------
+        if tipo == "firewall":
+            rival.bloqueado = True
 
-        if tipo == "robar":
+        elif tipo == "sql":
+            jugador.sql_inyeccion = True
+
+        elif tipo == "phishing":
+            if random.random() < 0.5 and rival.ayudas > 0:
+                rival.ayudas -= 1
+                jugador.ayudas += 1
+
+        elif tipo == "ddos":
+            rival.ddos = True
+
+        elif tipo == "ransom":
+            new_pos = max(0, rival.posicion - 2)
+            tablero.mover_a_casilla(rival, new_pos)
+
+        elif tipo == "zero_day":
+            jugador.zero_day = True
+
+        elif tipo == "robar":
             if rival.ayudas > 0:
                 rival.ayudas -= 1
                 jugador.ayudas += 1
-                print("🟢 Robaste una ayuda al rival.")
-            else:
-                print("⚠ El rival no tiene ayudas para robar.")
 
         elif tipo == "intercambiar":
-            # Intercambiar posiciones
-            pos_j = jugador.posicion
-            pos_r = rival.posicion
-
-            tablero.mover_directo(jugador, pos_r)
-            tablero.mover_directo(rival, pos_j)
-
-            print("🟢 Intercambiaste posiciones con el rival.")
+            p1 = jugador.posicion
+            p2 = rival.posicion
+            tablero.mover_a_casilla(jugador, p2)
+            tablero.mover_a_casilla(rival, p1)
 
         elif tipo == "dado_neg":
             jugador.dado_negativo = True
-            print("🟢 Tu próximo dado será NEGATIVO.")
 
         elif tipo == "perder_ayuda":
             if jugador.ayudas > 0:
                 jugador.ayudas -= 1
-                print("🟢 Perdiste una ayuda voluntariamente (trampa).")
-            else:
-                print("⚠ No tienes ayudas para perder.")
 
-    # -----------------------------------------------------
-    # BOTONES DE LA TIENDA
-    # -----------------------------------------------------
+        # ✔ Cerrar tienda automáticamente después de comprar
+        cerrar_tienda()
 
-    tienda.content.append(Button(
-        text=f"Robar ayuda ({precios['robar']} pts)",
-        color=color.azure,
-        on_click=lambda: comprar_trampa("robar")
-    ))
+    # ---------------------------------------------------------
+    # Botones en 2 COLUMNAS con fondo negro real
+    # ---------------------------------------------------------
+    botones = [
+        ("Firewall - Rival no avanza", "firewall"),
+        ("Inyección SQL - Avanza +1", "sql"),
+        ("Phishing - 50% robar ayuda", "phishing"),
+        ("DDoS - Rival sin ayudas", "ddos"),
+        ("Ransomware - Rival -2 casillas", "ransom"),
+        ("Exploit Zero-Day - Auto win", "zero_day"),
+        ("Robar ayuda", "robar"),
+        ("Intercambiar posiciones", "intercambiar"),
+        ("Dado negativo", "dado_neg"),
+        ("Perder ayuda propia", "perder_ayuda"),
+    ]
 
-    tienda.content.append(Button(
-        text=f"Intercambiar posiciones ({precios['intercambiar']} pts)",
-        color=color.orange,
-        on_click=lambda: comprar_trampa("intercambiar")
-    ))
+    x_positions = [-0.35, 0.35]
+    y = 0.15
 
-    tienda.content.append(Button(
-        text=f"Dado negativo ({precios['dado_neg']} pts)",
-        color=color.magenta,
-        on_click=lambda: comprar_trampa("dado_neg")
-    ))
+    for i, (texto, tipo) in enumerate(botones):
+        columna = i % 2
+        fila = i // 2
 
-    tienda.content.append(Button(
-        text=f"Perder ayuda ({precios['perder_ayuda']} pts)",
-        color=color.red,
-        on_click=lambda: comprar_trampa("perder_ayuda")
-    ))
+        pos_x = x_positions[columna]
+        pos_y = y - (fila * 0.11)
 
-    # Botón cerrar
-    tienda.content.append(Button(text="Cerrar", color=color.gray, on_click=tienda.close))
+        Entity(
+            parent=ui,
+            model="quad",
+            color=color.black,
+            scale=(0.58, 0.075),
+            x=pos_x,
+            y=pos_y,
+        )
+
+        btn = Button(
+            parent=ui,
+            text=f"{texto} ({precios[tipo]} pts)",
+            model='quad',
+            texture=None,
+            disable_texture=True,
+            color=color.black,
+            highlight_color=color.black,
+            pressed_color=color.black,
+            text_color=color.white,
+            scale=(0.55, 0.07),
+            x=pos_x,
+            y=pos_y,
+            on_click=lambda t=tipo: comprar_trampa(t)
+        )
+
+        if hasattr(btn, 'graphic'):
+            btn.graphic.color = color.black
+
+    # ---------------------------------------------------------
+    # Cerrar tienda con ESCAPE
+    # ---------------------------------------------------------
+    def input(key):
+        if key == "escape":
+            cerrar_tienda()
+
+    ui.input = input

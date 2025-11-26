@@ -21,6 +21,17 @@ class JugadorBase(Entity):
         self.posicion = 1
         self.posicion_inicial = 1
 
+        # ----------------------------------------------------------
+        #  ⚡ ATRIBUTOS DE TRAMPAS (NUEVOS) — sin tocar tu código
+        # ----------------------------------------------------------
+        self.bloqueado = False        # Firewall: no avanza un turno
+        self.extra_move = False       # SQL Injection: +1 casilla extra
+        self.ddos = False             # No puede usar ayudas
+        self.autorespuesta = False    # Respuesta automática correcta
+        self.phishing = False         # Intento de robar ayuda
+        self.ransom = False           # Retrocede al rival 2
+        # ----------------------------------------------------------
+
         # bandera para evitar movimientos concurrentes
         self._moving = False
 

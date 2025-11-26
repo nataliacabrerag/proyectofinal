@@ -114,3 +114,4 @@ def cerrar(fondo, capa, callback):
     fondo.disable()
     capa.disable()
     callback()
+
