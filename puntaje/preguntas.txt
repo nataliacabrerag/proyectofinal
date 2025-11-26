@@ -1,0 +1,26 @@
+Estás en un café con Wi-Fi gratis. ¿Qué deberías hacer antes de conectarte?;Conectarte de inmediato, todos lo hacen.;Usar una VPN o evitar ingresar a cuentas sensibles.;Descargar todo lo que necesites.;Usar redes sociales libremente.;B;
+Recibes un mensaje en redes que dice que ganaste un celular nuevo.;Das clic al enlace para reclamarlo.;Compartes el mensaje para “asegurar el premio”.;Revisas si la cuenta que lo envía es oficial.;Respondes para pedir más información.;C;
+Recibes un mensaje de un familiar pidiendo dinero urgente.;Envías el dinero.;Llamas al familiar directamente para confirmar.;Ignoras el mensaje.;Reenvías el mensaje a otros.;B;
+Una página desconocida te pide tus credenciales de correo.;Las ingresas para continuar.;Cierras la página y no das tus datos.;Usas una contraseña antigua.;Envías una captura del mensaje al soporte.;B;
+Un sitio web te pide “permitir notificaciones” para seguir navegando.;Las permites siempre.;Permites solo si es un sitio confiable.;Aceptas sin revisar.;Aceptas y luego las desactivas.;B;
+Te piden tu número de identificación en una encuesta en línea.;Lo das sin problema.;Verificas si el sitio es oficial antes de responder.;Envías datos falsos.;Cierras la encuesta y listo.;B;
+Un amigo te pasa un enlace acortado.;Le das clic de inmediato.;Usas un verificador de enlaces antes de abrirlo.;Lo abres en tu celular.;Lo compartes para que otros prueben.;B;
+Instalas una app y te pide permisos para acceder a tus fotos y contactos.;Le das aceptar a todo.;Solo aceptas los permisos necesarios.;Ignoras el aviso.;Los activas todos y luego los desactivas.;B;
+Aparece un mensaje diciendo “Tu PC está en riesgo, instala este antivirus ahora”.;Descargas el programa del mensaje.;Usas tu antivirus oficial para escanear.;Ignoras la alerta.;Reinicias el PC.;B;
+Un amigo te pide tu contraseña de Netflix para “compartir cuenta”.;Se la das.;Le ofreces ver juntos sin darle la clave.;La cambias después de dársela.;Usas la misma contraseña en todo.;B;
+Tienes la misma contraseña para todas tus cuentas.;Es más fácil recordarla.;Usas contraseñas diferentes y seguras.;La anotas en un papel visible.;La compartes con un amigo.;B;
+Alguien en redes sociales te envía una solicitud de amistad sin foto ni información.;La aceptas.;Revisas su perfil y decides si parece legítimo.;Le escribes para conocerlo.;La aceptas para tener más seguidores.;B;
+Descargas una app fuera de la tienda oficial porque promete más funciones.;La instalas igual.;Solo instalas apps desde fuentes oficiales.;Revisas los comentarios en foros.;Pruebas si funciona y luego los borras.;B;
+Una página te pide que aceptes cookies sin explicarte para qué son.;Las aceptas sin leer.;Revisas las políticas antes de aceptar.;Rechazas siempre.;Aceptas todas para continuar más rápido.;B;
+En la oficina, dejas tu computador encendido al irte a almorzar.;Lo dejas así, nadie lo usa.;Bloqueas la sesión antes de salir.;Lo apagas completamente.;Lo dejas abierto por si alguien necesita usarlo.;B;
+Un compañero te pide que le envíes un archivo confidencial por correo.;Lo adjuntas y lo envías.;Confirmas si está autorizado para recibirlo.;Lo subes a una nube pública.;Se lo mandas por WhatsApp.;B;
+Recibes un correo de tu “proveedor” con una factura adjunta.;Descargas el archivo y lo abres.;Verificas el remitente y el dominio antes de abrir.;Lo reenvías al área contable.;Lo ignoras.;B;
+Alguien publica fotos tuyas sin permiso.;Ignoras el hecho.;Reportas el contenido y solicitas su eliminación.;Le respondes públicamente.;Descargas las fotos.;B;
+Un “técnico” llama diciendo que necesita acceso remoto a tu PC.;Le das acceso para que revise.;Cuelgas y contactas al servicio oficial.;Le das acceso parcial.;Pides que te envíe un correo.;B;
+Te llega un enlace para actualizar tu contraseña del correo.;Haces clic de inmediato.;Accedes directamente al sitio oficial para cambiarla.;Envías el enlace a soporte.;Lo ignoras.;B;
+Encuentras una USB en la universidad.;La conectas a tu portátil para ver qué tiene.;La entregas a la oficina de seguridad.;La guardas “por si acaso”.;La prestas a un amigo.;B;
+En redes ves una encuesta que pide tus datos personales para un “proyecto académico”.;Los compartes sin problema.;Revisas quién la creó y si es confiable.;Respondes parcialmente.;Envías datos falsos.;B;
+Recibes un correo del banco con tu nombre, pero el enlace lleva a otra dirección.;Haces clic igual.;Escribes manualmente la dirección del banco.;Lo abres desde tu celular.;Reenvías el mensaje.;B;
+Te llega un mensaje con un código de verificación que no solicitaste.;Lo ignoras.;Cambias tu contraseña inmediatamente.;Envías el código a soporte.;Aceptas el código por si acaso.;B;
+Tu computadora muestra un mensaje diciendo que tus archivos están cifrados y piden dinero (ransomware).;Pagas el rescate.;Desconectas el equipo de la red y avisas a seguridad.;Reinicias el computador.;Ignoras el mensaje.;B;
+

@@ -328,23 +328,3 @@ def limpiar_pregunta(btn_tirar, limpiar_btn=True):
                 btn_tirar.visible = True
         except:
             pass
-
-
-
-# ==================================================
-#        🔥 AÑADIDO: RESPONDER TAMBIÉN CON TECLADO
-# ==================================================
-
-teclas_validas = {"a": "A", "b": "B", "c": "C", "d": "D"}
-
-def input(key):
-    if pregunta_actual:  # Solo si hay una pregunta activa
-        key = key.lower()
-        if key in teclas_validas:
-            letra = teclas_validas[key]
-
-            # Buscar botón correspondiente y simular clic
-            for b in botones_opciones:
-                if b.letra == letra:
-                    b.on_click()
-                    break

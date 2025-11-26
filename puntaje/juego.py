@@ -14,6 +14,7 @@ class Dado3D(Entity):
             collider=None,
             **kwargs
         )
+        # rotaciones simbólicas por cara (no hace falta exactitud)
         self.rotaciones = {
             1: Vec3(90, 90, 0),
             2: Vec3(90, 180, 0),
@@ -27,6 +28,7 @@ class Dado3D(Entity):
         self.texto_aviso = None
 
     def lanzar(self, callback=None):
+        """Aniama (simple) y devuelve el número mediante callback."""
         self.callback_externo = callback
         resultado = randint(1,6)
         self.resultado_lanzado = resultado
@@ -86,12 +88,14 @@ class JugadorBase(Entity):
         self.pos_offset_x = offset_x
         self.pos_offset_z = offset_z
         self.posicion = 1
+        # colocar en casilla 1
         self.mover_a_casilla(1)
 
     def mover_a_casilla(self, num):
         num = max(1, min(100, int(num)))
         self.posicion = num
         x, y, z = self.tablero.casilla_a_pos(num)
+        # aplicar offset para no solaparse
         self.position = Vec3(x + self.pos_offset_x, 0.2, z + self.pos_offset_z)
         print(f"[{self.nombre}] mover_a_casilla -> casilla {num} -> pos {self.position}")
 
@@ -108,6 +112,7 @@ class Jugador1(JugadorBase):
     def __init__(self, tablero):
         super().__init__('Jugador1', color.azure, tablero, offset_x=-0.18, offset_z=0, scale_tuple=(0.25,0.25,0.25))
 
+
 class Jugador2(JugadorBase):
     def __init__(self, tablero):
         super().__init__('Jugador2', color.orange, tablero, offset_x=0.18, offset_z=0, scale_tuple=(0.2,0.2,0.2))
@@ -120,9 +125,12 @@ class Tablero(Entity):
     def __init__(self, cell_size=0.5):
         super().__init__()
         self.cell_size = cell_size
+        # tablero visual (puede ser solo un plano)
         self.model = Entity(model='quad', scale=(5,5), color=color.gray, rotation_x=90, y=0)
-
+        # El origen de la cuadrícula se centra en el plano; casillas de 10x10
+        # No necesita modelo 3D extra
     def casilla_a_pos(self, num):
+        """Convierte número de 1..100 a coordenadas x,z (centro de casilla)"""
         num = max(1, min(100, int(num)))
         fila = (num - 1) // 10
         col = (num - 1) % 10
@@ -133,8 +141,9 @@ class Tablero(Entity):
         z = fila * self.cell_size - offset
         return (x, 0, z)
 
+
 # ---------------------------
-#  Preguntas
+#  Preguntas (muy simple)
 # ---------------------------
 PREGUNTAS = [
     {"pregunta":"¿Color de cielo en un día claro?", "opciones":["Verde","Azul","Rojo","Negro"], "correcta":"B"},
@@ -146,6 +155,7 @@ PREGUNTAS = [
 def seleccionar_pregunta_aleatoria():
     return choice(PREGUNTAS)
 
+
 # ---------------------------
 #  Juego principal
 # ---------------------------
@@ -156,57 +166,67 @@ class Juego(Ursina):
         Sky(color=color.light_gray)
         print("=== INICIANDO JUEGO ===")
 
+        # tablero y jugadores
         self.tablero = Tablero(cell_size=0.5)
         self.j1 = Jugador1(self.tablero)
         self.j2 = Jugador2(self.tablero)
 
+        # botón de tirar (usa el dado 3D)
         self.btn_dado = Button(text="🎲 Tirar dado", scale=(0.24,0.1), y=-0.45, color=color.azure, on_click=self.tirar_dado)
         self.texto = Text("", y=-0.32, scale=1.3)
 
-        self.turno = 1
+        # estado
+        self.turno = 1  # 1 o 2
         self.ultimo_valor_dado = None
         self.dado_entity = None
 
         print("✔ Juego listo. Haz click en 'Tirar dado'")
 
     def tirar_dado(self):
+        # crear/usar dado
         if not self.dado_entity:
             self.dado_entity = Dado3D(position=(0,1.2,0), scale=0.5)
-
+        # desactivar botón mientras procesa
         self.btn_dado.disable()
         self.texto.text = "Tirando..."
-
+        # lanzar dado y pasar callback
         self.dado_entity.lanzar(callback=self._dado_termino)
 
     def _dado_termino(self, valor):
+        # callback del dado: valor es 1..6
         self.ultimo_valor_dado = int(valor)
         self.texto.text = f"Salió: {valor} — mostrando pregunta..."
         print(f"[JUEGO] dado terminó con valor {valor} (turno jugador {self.turno})")
 
+        # mostrar pregunta breve en UI; la pregunta manejará mover en caso de acierto
         self.mostrar_pregunta(lambda acierto: self._procesar_respuesta_pregunta(acierto))
 
     def mostrar_pregunta(self, callback_on_answer):
+        """Muestra pregunta simple en pantalla; llama callback_on_answer(acierto:bool)"""
         pregunta = seleccionar_pregunta_aleatoria()
+        # limpiar UI previa
         self.limpiar_pregunta_ui()
 
+        # label pregunta
         self.ui_text_pregunta = Text(parent=camera.ui, text=pregunta["pregunta"], y=0.35, scale=1.2, background=True, background_color=color.black, color=color.white, wordwrap=40)
 
+        # crear botones A..D
         letras = ["A","B","C","D"]
         posiciones = [Vec3(-0.5,0.15,1), Vec3(0.5,0.15,1), Vec3(-0.5,-0.05,1), Vec3(0.5,-0.05,1)]
         self.ui_botones = []
         for i, opcion in enumerate(pregunta["opciones"]):
             b = Button(parent=camera.ui, text=f"{letras[i]}. {opcion}", position=posiciones[i], scale=(0.9,0.1), color=color.azure, text_color=color.white)
-
             def make_onclick(letra):
                 def onclick():
                     acierto = (letra == pregunta["correcta"])
+                    # feedback visual
                     if acierto:
                         b.color = color.green
                     else:
                         b.color = color.red
+                    # llamar callback externo
                     invoke(callback_on_answer, acierto, delay=0.3)
                 return onclick
-
             b.on_click = make_onclick(letras[i])
             self.ui_botones.append(b)
 
@@ -221,12 +241,14 @@ class Juego(Ursina):
                 else:
                     try: attr.disable()
                     except: pass
-        if hasattr(self, 'ui_text_pregunta'): setattr(self, 'ui_text_pregunta', None)
-        if hasattr(self, 'ui_botones'): setattr(self, 'ui_botones', None)
+        # limpieza simple: eliminar atributos para evitar reusar referencias
+        if hasattr(self, 'ui_text_pregunta'): delattr = setattr(self, 'ui_text_pregunta', None)
+        if hasattr(self, 'ui_botones'): delattr = setattr(self, 'ui_botones', None)
 
     def _procesar_respuesta_pregunta(self, acierto):
+        """Callback al responder la pregunta. Si acierto: mover según ultimo_valor_dado"""
         print(f"[JUEGO] Resultado pregunta: {'acertó' if acierto else 'falló'}")
-
+        # habilitar botón dado de nuevo al final del flujo
         def continuar():
             self.turno = 2 if self.turno == 1 else 1
             self.btn_dado.enable()
@@ -240,31 +262,13 @@ class Juego(Ursina):
             jugador.avanzar(pasos)
             invoke(continuar, delay=0.2)
         else:
+            # no avanza; sólo limpiar y pasar turno
             invoke(continuar, delay=0.6)
 
 
-# -----------------------------------------------------------------
-# 🔥 AÑADIDO: RESPONDER PREGUNTAS CON EL TECLADO A/B/C/D
-# -----------------------------------------------------------------
-
-teclas_validas = {"a": "A", "b": "B", "c": "C", "d": "D"}
-
-def input(key):
-    """Captura A/B/C/D y simula clic en el botón correspondiente."""
-    if hasattr(juego, "ui_botones") and juego.ui_botones:
-        k = key.lower()
-        if k in teclas_validas:
-            letra = teclas_validas[k]
-
-            for b in juego.ui_botones:
-                if b.text.startswith(letra + "."):
-                    b.on_click()
-                    break
-
-
-# -----------------------------------------------------------------
-# Ejecutar
-# -----------------------------------------------------------------
+# -------------------------------------------------------
+#  Ejecutar
+# -------------------------------------------------------
 if __name__ == '__main__':
     juego = Juego()
     juego.run()
