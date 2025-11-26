@@ -16,23 +16,29 @@ puntaje_jugador2 = 0
 
 
 def obtener_puntaje(num):
-    return TABLA_PUNTAJE.get(num, 0)
+    """
+    Hace que las casillas 26+ repitan la tabla desde el 1.
+    Ejemplo:
+        26 -> 1
+        27 -> 2
+        50 -> 25
+        51 -> 1
+    """
+    num_real = ((num - 1) % 25) + 1
+    return TABLA_PUNTAJE.get(num_real, 0)
 
 
 def sumar_puntaje_jugador(jugador, pregunta_num):
-    """
-    Suma los puntos correspondientes de acuerdo con la 'pregunta_num' (o casilla)
-    y devuelve el total actualizado del jugador.
-    jugador: 1 o 2
-    pregunta_num: número de casilla o referencia usada para buscar puntos
-    """
     global puntaje_jugador1, puntaje_jugador2
 
     puntos = obtener_puntaje(pregunta_num)
 
     if jugador == 1:
         puntaje_jugador1 += puntos
+        print(f"[SUMA] Jugador 1 ganó {puntos} puntos (casilla {pregunta_num} → ciclo). Total = {puntaje_jugador1}")
         return puntaje_jugador1
+
     else:
         puntaje_jugador2 += puntos
+        print(f"[SUMA] Jugador 2 ganó {puntos} puntos (casilla {pregunta_num} → ciclo). Total = {puntaje_jugador2}")
         return puntaje_jugador2
