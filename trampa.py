@@ -1,5 +1,5 @@
 from ursina import *
-import puntaje 
+import puntaje
 
 
 def mostrar_mensaje_centrado(texto, color_texto=color.white, duracion=4, tam=2):
@@ -47,16 +47,13 @@ def abrir_tienda_trampas(tablero, jugador_actual):
         parent=ui
     )
 
-    # Precios (Intercambiar posiciones y Turbo eliminados)
+    # Precios (Resbalón eliminado)
     precios = {
-        "Firewall": 7,
-        "Phishing": 5,
-        "DDoS": 6,
-        "Ransomware": 9,
-        "Zero-Day": 10,
-        "Robar ayuda": 5,
-        "Resbalón": 6,
-        "Avanzar 10": 8
+        "Firewall": 200,
+        "Phishing": 400,
+        "DDoS": 100,
+        "Zero-Day": 150,
+        "Robar ayuda": 200,
     }
 
     # Restar puntaje
@@ -119,7 +116,7 @@ def abrir_tienda_trampas(tablero, jugador_actual):
             mostrar_mensaje_centrado(f"Robaste {robados} puntos", color_texto=color.green, duracion=3, tam=1.6)
             print(f"[PHISHING] Robaste {robados} puntos")
 
-        # DDoS (INMEDIATA) - Retrocede rival 3 y actualiza tablero
+        # DDoS (INMEDIATA)
         elif tipo == "DDoS":
             try:
                 rival.posicion = max(1, int(getattr(rival, "posicion", 1)) - 3)
@@ -138,20 +135,7 @@ def abrir_tienda_trampas(tablero, jugador_actual):
             mostrar_mensaje_centrado("Rival -3 casillas", color_texto=color.orange, duracion=3, tam=1.6)
             print("[DDoS] Rival retrocede 3 casillas")
 
-        # RANSOMWARE
-        elif tipo == "Ransomware":
-            perdidos = 300
-            if jugador_actual == 1:
-                puntaje.puntaje_jugador2 = max(0, puntaje.puntaje_jugador2 - perdidos)
-            else:
-                puntaje.puntaje_jugador1 = max(0, puntaje.puntaje_jugador1 - perdidos)
-
-            tablero.actualizar_puntaje_ui()
-            info.text = f"Ransomware: El rival pierde {perdidos} puntos"
-            mostrar_mensaje_centrado(f"Rival -{perdidos} puntos", color_texto=color.orange, duracion=3, tam=1.6)
-            print(f"[RANSOMWARE] Rival pierde {perdidos} puntos")
-
-        # Zero-Day (INMEDIATA) - Avanza 4 y actualiza tablero
+        # Zero-Day (INMEDIATA)
         elif tipo == "Zero-Day":
             try:
                 jugador.posicion = int(getattr(jugador, "posicion", 1)) + 4
@@ -170,25 +154,6 @@ def abrir_tienda_trampas(tablero, jugador_actual):
             mostrar_mensaje_centrado("Avanzas 4 casillas", color_texto=color.green, duracion=3, tam=1.6)
             print("[Zero-Day] Avanzaste 4 casillas")
 
-        # Avanzar 10 (INMEDIATA)
-        elif tipo == "Avanzar 10":
-            try:
-                jugador.posicion = int(getattr(jugador, "posicion", 1)) + 10
-
-                tablero.mover_a_casilla(jugador, jugador.posicion)
-
-                if jugador_actual == 1:
-                    tablero.pos_j1 = jugador.posicion
-                else:
-                    tablero.pos_j2 = jugador.posicion
-
-            except Exception:
-                pass
-
-            info.text = "Avanzas 10 casillas"
-            mostrar_mensaje_centrado("Avanzas 10 casillas", color_texto=color.green, duracion=3, tam=1.6)
-            print("[Avanzar 10] Avanzaste 10 casillas")
-
         # Robar ayuda
         elif tipo == "Robar ayuda":
             if hasattr(rival, "ayuda") and rival.ayuda is not None:
@@ -201,26 +166,7 @@ def abrir_tienda_trampas(tablero, jugador_actual):
                 info.text = "El rival no tenía ayuda que robar"
                 print("[Robar ayuda] No había ayuda")
 
-        # Resbalón (INMEDIATA) - Retrocede rival 2
-        elif tipo == "Resbalón":
-            try:
-                rival.posicion = max(1, int(getattr(rival, "posicion", 1)) - 2)
-
-                tablero.mover_a_casilla(rival, rival.posicion)
-
-                if jugador_actual == 1:
-                    tablero.pos_j2 = rival.posicion
-                else:
-                    tablero.pos_j1 = rival.posicion
-
-            except Exception:
-                pass
-
-            info.text = "Resbalón: el rival retrocede 2 casillas"
-            mostrar_mensaje_centrado("Rival -2 casillas", color_texto=color.orange, duracion=3, tam=1.6)
-            print("[Resbalón] Rival retrocede 2 casillas")
-
-        # Sin efecto
+        # Sin efecto (Resbalón ya no existe)
         else:
             info.text = f"Trampa '{tipo}' seleccionada (sin efecto implementado)"
             print(f"[TRAMPA] {tipo} no implementada completamente")
@@ -237,7 +183,7 @@ def abrir_tienda_trampas(tablero, jugador_actual):
         if hasattr(tablero, 'boton_tienda'):
             tablero.boton_tienda.enabled = True
 
-    # Botones
+    # Botones disponibles
     botones = list(precios.keys())
     x_positions = [-0.35, 0.35]
     y = 0.15

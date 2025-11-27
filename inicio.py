@@ -14,13 +14,6 @@ window.title = 'Juego de Estructuras'
 camera.orthographic = True
 camera.fov = 9
 
-<<<<<<< HEAD
-
-
-
-# --- FONDO QUE OCUPA TODA LA PANTALLA ---
-=======
->>>>>>> 38e918a891a10d78c6b8207912ba331005c3b591
 def ajustar_fondo():
     aspecto = window.aspect_ratio
     fondo.scale = (aspecto * 9, 9)

@@ -479,12 +479,6 @@ class Tablero(Entity):
         jugador_actual = 1 if self.turno_jugador1 else 2
         abrir_tienda_trampas(self, jugador_actual)
         
-
-
-# ======================================================================
-#  🔥 INPUT GLOBAL NECESARIO PARA TECLAS A/B/C/D EN RESPUESTAS
-#  y MOVIMIENTO MANUAL (W/S para J1, UP/DOWN para J2)
-# ======================================================================
 teclas_validas = {"a": "A", "b": "B", "c": "C", "d": "D"}
 
 def _buscar_tablero_instancia():
@@ -505,30 +499,25 @@ def _procesar_input_preguntas(key):
     Lógica original para A/B/C/D -- encapsulada aquí para mantenerla limpia.
     """
     try:
-        # print("TECLA:", key)
         pass
     except:
         pass
 
     k = key.lower()
 
-    # Importar módulo de preguntas
     try:
         import preguntas
     except:
         return
 
-    # Si no hay pregunta activa, ignorar
     if not hasattr(preguntas, "pregunta_actual"):
         return
     if preguntas.pregunta_actual is None:
         return
 
-    # Solo procesamos A/B/C/D
     if k in teclas_validas:
         letra = teclas_validas[k]
 
-        # Buscar botón con la letra correcta
         for b in preguntas.botones_opciones:
             if getattr(b, "letra", None) == letra:
                 try:
@@ -562,15 +551,12 @@ def _procesar_input_movimiento_manual(key):
 
     player = mm.get("player")
     direction = int(mm.get("direction", 1))
-    # keys permitidas para avance/retroceso según jugador
     if player == 1:
         avanzar_key = "w"
         retro_key = "s"
     else:
-        # soportar variaciones 'up' y 'up arrow'
         avanzar_key_options = ("up", "up arrow")
         retro_key_options = ("down", "down arrow")
-        # detect en k
         if k in avanzar_key_options:
             avanzar = True
         elif k in retro_key_options:
@@ -578,7 +564,6 @@ def _procesar_input_movimiento_manual(key):
         else:
             avanzar = None
 
-    # determinar si la pulsación corresponde a la dirección esperada
     accepted = False
     if player == 1:
         if direction == 1 and k == avanzar_key:
@@ -592,16 +577,14 @@ def _procesar_input_movimiento_manual(key):
             accepted = True
 
     if not accepted:
-        return  # ignorar otras teclas
+        return  
 
-    # procesar un paso
     try:
         pasos_restantes = int(mm.get("steps_left", 0))
     except:
         pasos_restantes = 0
 
     if pasos_restantes <= 0:
-        # nada que hacer
         tablero.manual_move = None
         try:
             if tablero.texto_manual:
@@ -611,7 +594,6 @@ def _procesar_input_movimiento_manual(key):
             pass
         return
 
-    # mover el jugador una casilla en la dirección indicada
     if player == 1:
         actual = tablero.pos_j1
         nuevo = max(1, min(100, actual + direction))
@@ -623,10 +605,8 @@ def _procesar_input_movimiento_manual(key):
         tablero.mover_a_casilla(tablero.jugador2, nuevo)
         tablero.pos_j2 = nuevo
 
-    # decrementar contador
     mm["steps_left"] = pasos_restantes - 1
 
-    # actualizar texto_manual
     try:
         if tablero.texto_manual:
             try: tablero.texto_manual.disable()
@@ -640,9 +620,9 @@ def _procesar_input_movimiento_manual(key):
             tablero.texto_manual = Text(
                 parent=camera.ui,
                 text=f"Movimiento manual Jugador {player}: pulsa {tecla} {mm['steps_left']} veces",
-                origin=(-1, -1),     # esquina inferior izquierda
-                x=-0.88,             # pegado a la izquierda
-                y=-0.47,             # abajo
+                origin=(-1, -1),    
+                x=-0.88,           
+                y=-0.47,            
                 scale=0.9,
                 background=True,
                 background_color=color.rgba(0, 0, 0, 180),
@@ -651,22 +631,17 @@ def _procesar_input_movimiento_manual(key):
 
 
         else:
-            # movimiento completado
-            # limpiar UI
             try:
                 if tablero.texto_manual:
                     tablero.texto_manual.disable()
             except:
                 pass
             tablero.manual_move = None
-
-            # habilitar boton dado (vuelve a permitir tirar)
             try:
                 tablero.boton_dado.enable()
             except:
                 pass
 
-            # sincronizar puntaje UI al finalizar el movimiento
             try:
                 tablero.actualizar_puntaje_ui()
             except:
