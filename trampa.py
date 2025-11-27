@@ -1,6 +1,5 @@
-# trampa.py — Botones de trampas con ejecución inmediata y bloqueo por puntaje
 from ursina import *
-import puntaje  # Importamos el módulo para operar sobre sus variables globales
+import puntaje 
 
 
 def mostrar_mensaje_centrado(texto, color_texto=color.white, duracion=4, tam=2):
@@ -29,15 +28,6 @@ def abrir_tienda_trampas(tablero, jugador_actual):
         )
         return
 
-    # Mensaje de tienda disponible
-    mostrar_mensaje_centrado(
-        "¡Tienda disponible!",
-        color_texto=color.green,
-        duracion=4,
-        tam=2.4
-    )
-
-    # Ocultar botones del tablero
     if hasattr(tablero, 'boton_dado'):
         tablero.boton_dado.enabled = False
     if hasattr(tablero, 'boton_tienda'):

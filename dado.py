@@ -71,7 +71,7 @@ class Dado3D(Entity):
                 background=True,
                 color=color.yellow
             )
-            invoke(self.ocultar_aviso, delay=1.2)
+            invoke(self.ocultar_aviso, delay=1)
 
         invoke(mostrar_aviso, delay=5.2)
 
