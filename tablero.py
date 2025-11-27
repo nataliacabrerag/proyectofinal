@@ -680,3 +680,87 @@ if __name__ == "__main__":
     Sky(color=color.gray)
     Tablero()
     app.run()
+
+
+#(1. Firewall (NO inmediata)
+
+#Marca al rival como bloqueado: rival.bloqueado = True
+
+#El rival pierde su próximo turno.
+
+#No mueve casillas ni modifica puntos.
+
+#Se activa cuando se compre, pero el efecto sucede en el turno del rival.
+
+#✅ 2. Phishing
+
+#Roba hasta 500 puntos del rival.
+
+#Los suma al jugador que la compró.
+#Reparte automáticamente según quién ejecute la trampa.
+
+#Ejemplo:
+#Rival tiene 340 → robas 340
+#Rival tiene 1000 → robas 500
+
+#✅ 3. DDoS (INMEDIATA)
+
+#El rival retrocede 3 casillas inmediatamente.
+
+#Usa:
+
+#rival.actualizar_posicion() si existe
+
+#o tablero.mover_a_casilla(rival, nueva_pos) como fallback
+
+#Si está muy atrás, lo deja mínimo en casilla 1.
+
+#✅ 4. Ransomware
+
+#El rival pierde 300 puntos.
+
+#No mueve casillas.
+
+#No congela ni bloquea.
+
+#✅ 5. Zero-Day (INMEDIATA)
+
+#avanzas 4 casillas de inmediato.
+
+#Usa la misma lógica de actualización que las otras trampas.
+
+#✅ 6. Avanzar 10 (INMEDIATA)
+
+#Avanzas 10 casillas inmediatamente.
+
+#✅ 7. Robar ayuda
+
+#Si el rival tiene una ayuda almacenada en rival.ayuda:
+
+#Tú la recibes
+
+#Al rival se le borra (rival.ayuda = None)
+
+#Si no tiene ayuda, no hace nada.
+
+#🔥 8. Intercambiar posiciones (INMEDIATA)
+
+#INTERCAMBIA LAS POSICIONES REALES DE LOS JUGADORES.
+#(Aunque ahora lo vamos a corregir como pediste.)
+
+#Deja:
+
+#Jugador1.posición = posición antigua del jugador2
+
+#Jugador2.posición = posición antigua del jugador1
+
+#PERO solo mueve el modelo visual, no actualiza correctamente pos_j1, pos_j2, o variables del tablero.
+#🔧 Por eso “funciona pero no funciona”.
+
+#✅ 9. Resbalón (INMEDIATA)
+
+#El rival retrocede 2 casillas (mínimo casilla 1).
+
+#✅ 10. Turbo (INMEDIATA)
+
+#Avanzas 2 casillas inmediatamente.)

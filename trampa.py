@@ -57,7 +57,7 @@ def abrir_tienda_trampas(tablero, jugador_actual):
         parent=ui
     )
 
-    # Precios
+    # Precios (Intercambiar posiciones y Turbo eliminados)
     precios = {
         "Firewall": 7,
         "Phishing": 5,
@@ -65,10 +65,8 @@ def abrir_tienda_trampas(tablero, jugador_actual):
         "Ransomware": 9,
         "Zero-Day": 10,
         "Robar ayuda": 5,
-        "Intercambiar posiciones": 8,
         "Resbalón": 6,
-        "Turbo": 6,
-        "Avanzar 10": 8,
+        "Avanzar 10": 8
     }
 
     # Restar puntaje
@@ -101,7 +99,9 @@ def abrir_tienda_trampas(tablero, jugador_actual):
 
         info.text = f"Tienda - Puntaje disponible: {nuevo_puntaje}"
 
-        # ========== TRAMPAS ==========
+        # =====================================================
+        # ===================   TRAMPAS   =====================
+        # =====================================================
 
         # FIREWALL (NO INMEDIATA)
         if tipo == "Firewall":
@@ -120,36 +120,28 @@ def abrir_tienda_trampas(tablero, jugador_actual):
                 puntaje.puntaje_jugador1 -= robados
                 puntaje.puntaje_jugador2 += robados
 
-            # refrescar UI y mostrar mensaje
             try:
                 tablero.actualizar_puntaje_ui()
             except:
                 pass
+
             info.text = f"PHISHING: Robaste {robados} puntos"
             mostrar_mensaje_centrado(f"Robaste {robados} puntos", color_texto=color.green, duracion=3, tam=1.6)
             print(f"[PHISHING] Robaste {robados} puntos")
 
-        # DDoS (INMEDIATA)
+        # DDoS (INMEDIATA) - Retrocede rival 3 y actualiza tablero
         elif tipo == "DDoS":
-            # retroceder 3 casillas (asegurando límites)
             try:
                 rival.posicion = max(1, int(getattr(rival, "posicion", 1)) - 3)
-                # usar método de actualización del jugador (implementado en tablero si falta)
-                if hasattr(rival, "actualizar_posicion"):
-                    rival.actualizar_posicion()
-                else:
-                    # intento fallback: si tablero tiene mover_a_casilla lo uso
-                    try:
-                        tablero.mover_a_casilla(rival, rival.posicion)
-                    except:
-                        pass
-            except Exception:
-                pass
 
-            # actualizar UI
-            try:
-                tablero.actualizar_puntaje_ui()
-            except:
+                tablero.mover_a_casilla(rival, rival.posicion)
+
+                if jugador_actual == 1:
+                    tablero.pos_j2 = rival.posicion
+                else:
+                    tablero.pos_j1 = rival.posicion
+
+            except Exception:
                 pass
 
             info.text = "DDoS: El rival retrocede 3 casillas"
@@ -169,17 +161,18 @@ def abrir_tienda_trampas(tablero, jugador_actual):
             mostrar_mensaje_centrado(f"Rival -{perdidos} puntos", color_texto=color.orange, duracion=3, tam=1.6)
             print(f"[RANSOMWARE] Rival pierde {perdidos} puntos")
 
-        # Zero-Day (INMEDIATA)
+        # Zero-Day (INMEDIATA) - Avanza 4 y actualiza tablero
         elif tipo == "Zero-Day":
             try:
                 jugador.posicion = int(getattr(jugador, "posicion", 1)) + 4
-                if hasattr(jugador, "actualizar_posicion"):
-                    jugador.actualizar_posicion()
+
+                tablero.mover_a_casilla(jugador, jugador.posicion)
+
+                if jugador_actual == 1:
+                    tablero.pos_j1 = jugador.posicion
                 else:
-                    try:
-                        tablero.mover_a_casilla(jugador, jugador.posicion)
-                    except:
-                        pass
+                    tablero.pos_j2 = jugador.posicion
+
             except Exception:
                 pass
 
@@ -191,13 +184,14 @@ def abrir_tienda_trampas(tablero, jugador_actual):
         elif tipo == "Avanzar 10":
             try:
                 jugador.posicion = int(getattr(jugador, "posicion", 1)) + 10
-                if hasattr(jugador, "actualizar_posicion"):
-                    jugador.actualizar_posicion()
+
+                tablero.mover_a_casilla(jugador, jugador.posicion)
+
+                if jugador_actual == 1:
+                    tablero.pos_j1 = jugador.posicion
                 else:
-                    try:
-                        tablero.mover_a_casilla(jugador, jugador.posicion)
-                    except:
-                        pass
+                    tablero.pos_j2 = jugador.posicion
+
             except Exception:
                 pass
 
@@ -217,44 +211,18 @@ def abrir_tienda_trampas(tablero, jugador_actual):
                 info.text = "El rival no tenía ayuda que robar"
                 print("[Robar ayuda] No había ayuda")
 
-        # Intercambiar posiciones (INMEDIATA)
-        elif tipo == "Intercambiar posiciones":
-            try:
-                pj = int(getattr(jugador, "posicion", 1))
-                pr = int(getattr(rival, "posicion", 1))
-                jugador.posicion, rival.posicion = pr, pj
-                if hasattr(jugador, "actualizar_posicion"):
-                    jugador.actualizar_posicion()
-                else:
-                    try:
-                        tablero.mover_a_casilla(jugador, jugador.posicion)
-                    except:
-                        pass
-                if hasattr(rival, "actualizar_posicion"):
-                    rival.actualizar_posicion()
-                else:
-                    try:
-                        tablero.mover_a_casilla(rival, rival.posicion)
-                    except:
-                        pass
-            except Exception:
-                pass
-
-            info.text = "Intercambiaste posiciones"
-            mostrar_mensaje_centrado("Posiciones intercambiadas", color_texto=color.green, duracion=3, tam=1.6)
-            print("[Intercambiar posiciones] Ejecutado")
-
-        # Resbalón (INMEDIATA)
+        # Resbalón (INMEDIATA) - Retrocede rival 2
         elif tipo == "Resbalón":
             try:
                 rival.posicion = max(1, int(getattr(rival, "posicion", 1)) - 2)
-                if hasattr(rival, "actualizar_posicion"):
-                    rival.actualizar_posicion()
+
+                tablero.mover_a_casilla(rival, rival.posicion)
+
+                if jugador_actual == 1:
+                    tablero.pos_j2 = rival.posicion
                 else:
-                    try:
-                        tablero.mover_a_casilla(rival, rival.posicion)
-                    except:
-                        pass
+                    tablero.pos_j1 = rival.posicion
+
             except Exception:
                 pass
 
@@ -262,42 +230,24 @@ def abrir_tienda_trampas(tablero, jugador_actual):
             mostrar_mensaje_centrado("Rival -2 casillas", color_texto=color.orange, duracion=3, tam=1.6)
             print("[Resbalón] Rival retrocede 2 casillas")
 
-        # Turbo (INMEDIATA)
-        elif tipo == "Turbo":
-            try:
-                jugador.posicion = int(getattr(jugador, "posicion", 1)) + 2
-                if hasattr(jugador, "actualizar_posicion"):
-                    jugador.actualizar_posicion()
-                else:
-                    try:
-                        tablero.mover_a_casilla(jugador, jugador.posicion)
-                    except:
-                        pass
-            except Exception:
-                pass
-
-            info.text = "Turbo: avanzas 2 casillas"
-            mostrar_mensaje_centrado("Avanzas 2 casillas", color_texto=color.green, duracion=3, tam=1.6)
-            print("[Turbo] Avanzaste 2 casillas")
-
+        # Sin efecto
         else:
             info.text = f"Trampa '{tipo}' seleccionada (sin efecto implementado)"
             print(f"[TRAMPA] {tipo} no implementada completamente")
 
-        # refrescar UI general de puntajes (por si algo cambió)
         try:
             tablero.actualizar_puntaje_ui()
         except:
             pass
 
-        # Cerrar tienda INMEDIATO
+        # Cerrar tienda
         ui.disable()
         if hasattr(tablero, 'boton_dado'):
             tablero.boton_dado.enabled = True
         if hasattr(tablero, 'boton_tienda'):
             tablero.boton_tienda.enabled = True
 
-    # Botones visuales
+    # Botones
     botones = list(precios.keys())
     x_positions = [-0.35, 0.35]
     y = 0.15
