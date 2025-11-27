@@ -1,4 +1,3 @@
-# tablero.py — CORREGIDO: dado negativo aplicado correctamente, tienda de trampas añadida en esquina inferior derecha
 from ursina import *
 from ursina.prefabs.editor_camera import EditorCamera
 from ursina import Audio
@@ -7,7 +6,7 @@ from dado import Dado3D
 import importlib
 import traceback
 from trampa import abrir_tienda_trampas
-import puntaje  # <-- agregado: módulo fuente de la verdad para los puntajes
+import puntaje  
 
 
 
@@ -83,9 +82,6 @@ class Tablero(Entity):
         self.jugador2 = Jugador2(modelo="models/jugador2.obj", tablero=self)
         print(f"Jugadores colocados: id1={id(self.jugador1)}, id2={id(self.jugador2)}")
 
-        # ---------------------------------------------------------
-        # Asegurar atributos de trampas en los objetos jugador
-        # ---------------------------------------------------------
         for p in (self.jugador1, self.jugador2):
             if not hasattr(p, "bloqueado"):
                 p.bloqueado = False
@@ -124,10 +120,8 @@ class Tablero(Entity):
         self.roll_count = 0
         self.current_roll_player = None
 
-        # Nuevo: estado para movimiento manual (después de acertar)
-        # manual_move: dict con keys: player (1/2), steps_left (int), direction (1/-1), target (int)
         self.manual_move = None
-        self.texto_manual = None  # Text UI que muestra instrucciones del movimiento manual
+        self.texto_manual = None  
 
         self.texto_turno = Text(parent=camera.ui, text="Turno: Jugador 1", y=.45, origin=(0,0), scale=1.2,
                                 background=True, color=color.violet
@@ -136,13 +130,13 @@ class Tablero(Entity):
         self.boton_dado = Button(parent=camera.ui, text="TIRAR DADO", scale=0.15,
                                  color=color.azure, y=-0.45, on_click=self.lanzar_dado)
 
-        # TIENDA TRAMPAS
         self.boton_tienda = Button(
             parent=camera.ui,
+
             text="TRAMPAS",
             scale=0.15,
-            color=color.orange,
-            x=0.75,
+           color=color.orange,
+            x=0.7,
             y=-0.45,
             on_click=self.abrir_tienda_trampas
         )
@@ -642,6 +636,7 @@ def _procesar_input_movimiento_manual(key):
                 tecla = "W" if direction == 1 else "S"
             else:
                 tecla = "UP" if direction == 1 else "DOWN"
+
             tablero.texto_manual = Text(
                 parent=camera.ui,
                 text=f"Movimiento manual Jugador {player}: pulsa {tecla} {mm['steps_left']} veces",
@@ -653,6 +648,7 @@ def _procesar_input_movimiento_manual(key):
                 background_color=color.rgba(0, 0, 0, 180),
                 color=color.white
             )
+
 
         else:
             # movimiento completado

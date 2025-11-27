@@ -8,17 +8,19 @@ from pathlib import Path
 
 app = Ursina()
 
-# --- CONFIGURACIÓN DE LA VENTANA ---
 window.fullscreen = False
 window.borderless = False
 window.title = 'Juego de Estructuras'
 camera.orthographic = True
 camera.fov = 9
 
+<<<<<<< HEAD
 
 
 
 # --- FONDO QUE OCUPA TODA LA PANTALLA ---
+=======
+>>>>>>> 38e918a891a10d78c6b8207912ba331005c3b591
 def ajustar_fondo():
     aspecto = window.aspect_ratio
     fondo.scale = (aspecto * 9, 9)
@@ -49,11 +51,6 @@ def abrir_creditos():
 def salir():
     print(" Cerrando el juego...")
     app.userExit()
-
-# --- TEXTO DEBUG ---
-texto_debug = Text(position=(-0.87, 0.45), color=color.yellow, scale=1.5)
-def update():
-    texto_debug.text = f"x={mouse.x:.2f}, y={mouse.y:.2f}"
 
 # --- ABRIR INSTRUCCIONES ---
 def abrir_instrucciones():
