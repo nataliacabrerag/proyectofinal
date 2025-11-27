@@ -1,8 +1,10 @@
 from ursina import *
+
 import sys
 import subprocess
 import os
 from pathlib import Path
+
 
 app = Ursina()
 
@@ -12,6 +14,9 @@ window.borderless = False
 window.title = 'Juego de Estructuras'
 camera.orthographic = True
 camera.fov = 9
+
+
+
 
 # --- FONDO QUE OCUPA TODA LA PANTALLA ---
 def ajustar_fondo():

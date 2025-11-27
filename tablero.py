@@ -1,12 +1,14 @@
 # tablero.py — CORREGIDO: dado negativo aplicado correctamente, tienda de trampas añadida en esquina inferior derecha
 from ursina import *
 from ursina.prefabs.editor_camera import EditorCamera
+from ursina import Audio
 from jugador import Jugador1, Jugador2
 from dado import Dado3D
 import importlib
 import traceback
 from trampa import abrir_tienda_trampas
 import puntaje  # <-- agregado: módulo fuente de la verdad para los puntajes
+
 
 
 CELL_SIZE = 0.93
@@ -19,6 +21,8 @@ for modname in INTENTOS_MODULOS:
     try:
         mod = importlib.import_module(modname)
         if hasattr(mod, "mostrar_pregunta"):
+           
+
             mostrar_pregunta = getattr(mod, "mostrar_pregunta")
             modulo_ok = modname
             break
@@ -31,6 +35,8 @@ for modname in INTENTOS_MODULOS:
             break
     except Exception as e:
         errores_import.append((modname, str(e)))
+      
+
 
 if mostrar_pregunta is None:
     def mostrar_pregunta(turno, j1, j2, p1, p2, texto_turno, boton_dado, mover_confirmado, tablero=None):
@@ -38,6 +44,10 @@ if mostrar_pregunta is None:
         jugador_entity = j1 if turno else j2
         mover_confirmado(jugador_entity)
         return p1, p2, True
+    self.sonido_pregunta = Audio('sounds/sonidoPregunta.mp3', autoplay=False, loop=False, volume=1)
+    self.sonido_pregunta.play()
+
+
 
 
 class Tablero(Entity):
@@ -46,6 +56,13 @@ class Tablero(Entity):
         super().__init__()
         print("Cargando tablero...")
 
+        
+        def reproducir_fondo():
+            self.musica_fondo = Audio('sounds/fondo.mp3', autoplay=True)
+            self.musica_fondo.volume = 0.4
+            self.musica_fondo.on_destroy = lambda: invoke(reproducir_fondo, delay=0.01)
+
+        reproducir_fondo()
         self.modelo = Entity(
             model="models/tablero.obj",
             texture="models/tablero.png",
@@ -113,7 +130,8 @@ class Tablero(Entity):
         self.texto_manual = None  # Text UI que muestra instrucciones del movimiento manual
 
         self.texto_turno = Text(parent=camera.ui, text="Turno: Jugador 1", y=.45, origin=(0,0), scale=1.2,
-                                background=True, background_color=color.black)
+                                background=True, color=color.violet
+                                )
 
         self.boton_dado = Button(parent=camera.ui, text="TIRAR DADO", scale=0.15,
                                  color=color.azure, y=-0.45, on_click=self.lanzar_dado)
@@ -121,7 +139,7 @@ class Tablero(Entity):
         # TIENDA TRAMPAS
         self.boton_tienda = Button(
             parent=camera.ui,
-            text="TIENDA TRAMPAS",
+            text="TRAMPAS",
             scale=0.15,
             color=color.orange,
             x=0.75,
@@ -132,26 +150,33 @@ class Tablero(Entity):
         self.puntaje_j1 = 0
         self.puntaje_j2 = 0
 
+        COLOR_PUNTAJE = color.rgba(0, 200, 255, 180)   # cian suave y translúcido
+        COLOR_TEXTO = color.white
+
+        # ---- PUNTAJE JUGADOR 1 ----
         self.texto_puntaje_j1 = Text(
             parent=camera.ui,
             text=f"Puntaje Jugador 1: {self.puntaje_j1}",
             origin=(-1, 0.5),
             x=-0.87,
             y=0.47,
-            scale=1.0,
+            scale=1.05,
+            color=color.azure,
             background=True,
-            background_color=color.rgba(0,0,0,150)
+            background_color=COLOR_PUNTAJE,
         )
 
+        # ---- PUNTAJE JUGADOR 2 ----
         self.texto_puntaje_j2 = Text(
             parent=camera.ui,
             text=f"Puntaje Jugador 2: {self.puntaje_j2}",
             origin=(-1, 1.5),
             x=-0.87,
             y=0.40,
-            scale=1.0,
+            scale=1.05,
+            color=color.azure,
             background=True,
-            background_color=color.rgba(0,0,0,150)
+            background_color=COLOR_PUNTAJE,
         )
 
         self.dado = None
@@ -302,6 +327,7 @@ class Tablero(Entity):
 
     def _hacer_pregunta(self, turno_bool):
         moved_flag = {"called": False}
+
 
         def mover_confirmado(jugador_entity, nueva_pos=None, retroceder=False):
             # Nota: ahora creamos un movimiento MANUAL y NO movemos al jugador instantáneamente.
@@ -458,6 +484,7 @@ class Tablero(Entity):
     def abrir_tienda_trampas(self):
         jugador_actual = 1 if self.turno_jugador1 else 2
         abrir_tienda_trampas(self, jugador_actual)
+        
 
 
 # ======================================================================
@@ -615,10 +642,18 @@ def _procesar_input_movimiento_manual(key):
                 tecla = "W" if direction == 1 else "S"
             else:
                 tecla = "UP" if direction == 1 else "DOWN"
-            tablero.texto_manual = Text(parent=camera.ui,
-                                       text=f"Movimiento manual Jugador {player}: pulsa {tecla} {mm['steps_left']} veces",
-                                       y=-0.32, scale=1, background=True,
-                                       background_color=color.rgba(0,0,0,180))
+            tablero.texto_manual = Text(
+                parent=camera.ui,
+                text=f"Movimiento manual Jugador {player}: pulsa {tecla} {mm['steps_left']} veces",
+                origin=(-1, -1),     # esquina inferior izquierda
+                x=-0.88,             # pegado a la izquierda
+                y=-0.47,             # abajo
+                scale=0.9,
+                background=True,
+                background_color=color.rgba(0, 0, 0, 180),
+                color=color.white
+            )
+
         else:
             # movimiento completado
             # limpiar UI
